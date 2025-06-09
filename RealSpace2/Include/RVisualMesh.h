@@ -5,6 +5,7 @@
 #include <array>
 #include <unordered_map>
 #include <string>
+#include <memory>
 
 class RCharCloth;
 
@@ -187,6 +188,7 @@ public:
 	u32				m_DataCnt;
 	LPDIRECT3DQUERY9	m_Query;
 };
+
 
 class RVisualMesh {
 public:
@@ -499,5 +501,22 @@ private:
 	bool			m_bClothGame{};
 	RCharCloth*		m_pCloth{};
 };
+
+// Smart pointer aliases for new features (gradual migration)
+namespace SmartPointers {
+    using RMeshPtr = std::unique_ptr<RMesh>;
+    using RAnimationPtr = std::shared_ptr<RAnimation>;
+    using RWeaponTracksPtr = std::unique_ptr<class RWeaponTracks>;
+
+    // Factory functions for safe creation
+    template<typename T, typename... Args>
+    std::unique_ptr<T> make_unique_safe(Args&&... args) {
+        try {
+            return std::make_unique<T>(std::forward<Args>(args)...);
+        } catch (...) {
+            return nullptr;
+        }
+    }
+}
 
 _NAMESPACE_REALSPACE2_END
