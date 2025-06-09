@@ -1,14 +1,14 @@
 # RVisualMesh Optimization TODOs
 
 ## HIGH PRIORITY (Implementar primero)
-- [ ] in_progress: Implementar pool de objetos para RWeaponTracks
-- [ ] Añadir constantes nombradas para magic numbers
-- [ ] Implementar hash map para node lookups en animaciones
-- [ ] Eliminar código muerto y funciones vacías
-- [ ] Añadir const correctness donde sea apropiado
+- [x] Implementar pool de objetos para RWeaponTracks
+- [x] Añadir constantes nombradas para magic numbers
+- [x] Implementar hash map para node lookups en animaciones
+- [x] Eliminar código muerto y funciones vacías
+- [x] Añadir const correctness donde sea apropiado
 
 ## MEDIUM PRIORITY
-- [ ] Cache de matrices con dirty flags
+- [x] Cache de matrices con dirty flags
 - [ ] Optimizar contenedores en RVisualMeshMgr
 - [ ] Mejorar LOD system
 - [ ] Smart pointers para nuevas features

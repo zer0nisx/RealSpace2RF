@@ -1152,11 +1152,12 @@ void RVisualMesh::RenderWeaponSub(RVisualMesh* WeaponMesh,
 {
 	auto&& WeaponPartInfo = m_WeaponPartInfo[sel_parts];
 
-	rmatrix WeaponWorldMatrix;
-	if (!m_isScale)
-		WeaponWorldMatrix = WeaponPartInfo.mat * m_WorldMat;
-	else
-		WeaponWorldMatrix = WeaponPartInfo.mat * m_ScaleMat * m_WorldMat;
+	// Use cached world matrix for optimization
+	const rmatrix& WeaponWorldMatrix = WeaponPartInfo.GetWorldMatrix(
+		m_WorldMat,
+		m_isScale ? &m_ScaleMat : nullptr,
+		m_isScale
+	);
 
 	WeaponMesh->SetWorldMatrix(WeaponWorldMatrix);
 
@@ -1455,6 +1456,11 @@ void RVisualMesh::SetPos(rvector pos,rvector dir,rvector up) {
 
 void RVisualMesh::SetWorldMatrix(const rmatrix& mat) {
 	m_WorldMat = mat;
+
+	// Invalidate weapon part matrix cache when world matrix changes
+	for (int i = 0; i < eq_parts_end; ++i) {
+		m_WeaponPartInfo[i].MarkDirty();
+	}
 }
 
 void RVisualMesh::AddWeapon(RWeaponMotionType type, RMesh* pMesh, RAnimation* pAni)
@@ -1996,7 +2002,7 @@ void RVisualMesh::SetBaseParts(RMeshPartsType parts) {
 	m_pTMesh[parts] = NULL;
 }
 
-rvector	RVisualMesh::GetBipRootPos(int frame)
+rvector	RVisualMesh::GetBipRootPos(int frame) const
 {
 	rvector v = rvector(0.f,0.f,0.f);
 
@@ -2013,7 +2019,7 @@ rvector	RVisualMesh::GetBipRootPos(int frame)
 	return v;
 }
 
-rvector	RVisualMesh::GetFootPosition()
+rvector	RVisualMesh::GetFootPosition() const
 {
 	rvector v = rvector(0.f,0.f,0.f);
 
@@ -2135,7 +2141,7 @@ rvector	RVisualMesh::GetRootPosition()
 	return GetTransPos(m);
 }
 
-rquaternion RVisualMesh::GetBipRootRot(int frame)
+rquaternion RVisualMesh::GetBipRootRot(int frame) const
 {
 	rquaternion q(0, 0, 0, 0);
 
@@ -2150,7 +2156,7 @@ rquaternion RVisualMesh::GetBipRootRot(int frame)
 	return q;
 }
 
-rmatrix	RVisualMesh::GetBipRootMat(int frame)
+rmatrix	RVisualMesh::GetBipRootMat(int frame) const
 {
 	auto q = GetBipRootRot(frame);
 	auto v = GetBipRootPos(frame);
@@ -2180,6 +2186,11 @@ void RVisualMesh::SetScale(const rvector& v)
 	m_vScale = v;
 	m_ScaleMat = ScalingMatrix(v),
 	m_isScale = true;
+
+	// Invalidate weapon part matrix cache when scale changes
+	for (int i = 0; i < eq_parts_end; ++i) {
+		m_WeaponPartInfo[i].MarkDirty();
+	}
 }
 
 void RVisualMesh::ClearScale()
@@ -2187,6 +2198,11 @@ void RVisualMesh::ClearScale()
 	m_vScale = rvector(1.f,1.f,1.f);
 	m_ScaleMat = IdentityMatrix();
 	m_isScale = false;
+
+	// Invalidate weapon part matrix cache when scale is cleared
+	for (int i = 0; i < eq_parts_end; ++i) {
+		m_WeaponPartInfo[i].MarkDirty();
+	}
 }
 
 void RVisualMesh::GetBBox(rvector& vMax,rvector& vMin)
@@ -2326,9 +2342,9 @@ void RVisualMesh::UpdateWeaponPartInfo(RMeshNode* pMeshNode)
 }
 
 
-AniFrameInfo* RVisualMesh::GetFrameInfo(RAniMode mode)
+AniFrameInfo* RVisualMesh::GetFrameInfo(RAniMode mode) const
 {
-	return &m_FrameInfo[mode];
+	return const_cast<AniFrameInfo*>(&m_FrameInfo[mode]);
 }
 
 void RVisualMesh::OnRestore()

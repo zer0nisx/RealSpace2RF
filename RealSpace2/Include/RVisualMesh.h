@@ -295,11 +295,11 @@ public:
 
 	bool IsSelectWeaponGrenade();
 
-	rvector			GetBipRootPos(int frame);
-	rquaternion		GetBipRootRot(int frame);
-	rmatrix			GetBipRootMat(int frame);
+	rvector			GetBipRootPos(int frame) const;
+	rquaternion		GetBipRootRot(int frame) const;
+	rmatrix			GetBipRootMat(int frame) const;
 
-	rvector			GetFootPosition();
+	rvector			GetFootPosition() const;
 
 	void GetBipTypeMatrix(rmatrix *mat, RMeshPartsPosInfoType type);
 
@@ -335,7 +335,7 @@ public:
 
 	int	 GetLastWeaponTrackPos(rvector* pOutVec);
 
-	AniFrameInfo* GetFrameInfo(RAniMode mode);
+	AniFrameInfo* GetFrameInfo(RAniMode mode) const;
 
 	void GetBBox(rvector& max, rvector& min);
 

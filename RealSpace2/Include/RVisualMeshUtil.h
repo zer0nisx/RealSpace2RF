@@ -155,11 +155,43 @@ public:
 		GetIdentityMatrix(mat);
 		vis = 1.f;
 		isUpdate = false;
+		// Initialize cache
+		GetIdentityMatrix(cachedWorldMatrix);
+		worldMatrixDirty = true;
+		lastUpdateFrame = 0;
+	}
+
+	// Get cached world matrix, recalculating if dirty
+	const rmatrix& GetWorldMatrix(const rmatrix& worldMat, const rmatrix* scaleMat = nullptr, bool useScale = false) const {
+		u64 currentFrame = GetGlobalTimeMS(); // Use time as frame counter
+
+		if (worldMatrixDirty || lastUpdateFrame != currentFrame) {
+			if (!useScale || !scaleMat) {
+				cachedWorldMatrix = mat * worldMat;
+			} else {
+				cachedWorldMatrix = mat * (*scaleMat) * worldMat;
+			}
+
+			worldMatrixDirty = false;
+			lastUpdateFrame = currentFrame;
+		}
+
+		return cachedWorldMatrix;
+	}
+
+	// Mark cache as dirty when matrix changes
+	void MarkDirty() {
+		worldMatrixDirty = true;
 	}
 
 	rmatrix mat;
 	float	vis;
 	bool	isUpdate;
+
+	// Matrix cache for optimization
+	mutable rmatrix cachedWorldMatrix;
+	mutable bool worldMatrixDirty;
+	mutable u64 lastUpdateFrame;
 };
 
 class RFireEffectTexture
