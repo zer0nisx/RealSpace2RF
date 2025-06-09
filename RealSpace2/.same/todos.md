@@ -13,6 +13,24 @@
 - [ ] Mejorar LOD system
 - [x] ✅ **COMPLETADO** - Smart pointers para nuevas features
 
+## 🚨 **CLOTH BUGS IDENTIFICADOS** (Nueva alta prioridad)
+- [ ] **Bug #1**: Character cloth meshes ignore custom normals
+  - Problema: Recalcula face normals con cross product cada frame
+  - Solución: Rotar vertex normals existentes para match deformation
+  - Archivo: `RCharCloth.cpp`, `RCloth.cpp`
+
+- [ ] **Bug #2**: Character cloth meshes become unlit (sharp falloff)
+  - Problema: Diffuse light response falls off too sharply beyond max attenuation
+  - Afecta: Nearest light source + sun source
+  - Solución: Copy-paste smooth falloff from standard meshes
+  - Archivo: Lighting calculations in cloth rendering
+
+- [ ] **Bug #3**: Character cloth ignores sub materials/material slots
+  - Problema: Applies base material across all geometry
+  - Solución A: Consolidate textures + modify UVs + merge materials
+  - Solución B: Separate meshes by material (vanilla client compatible)
+  - Archivo: Material handling in cloth system
+
 ## LOW PRIORITY
 - [ ] Threading para animaciones
 - [ ] SIMD optimizations
@@ -37,6 +55,7 @@
 ## PROGRESO ACTUAL
 🎯 **ALTA PRIORIDAD: COMPLETADA** (5/5 tareas)
 📊 **MEDIA PRIORIDAD: CASI COMPLETADA** (3/4 tareas completadas)
+🚨 **CLOTH BUGS: PENDIENTES** (3 bugs críticos identificados)
 
 ## COMPLETADO EN ESTA SESIÓN ✅
 1. **Optimizar contenedores en RVisualMeshMgr**:
@@ -50,5 +69,11 @@
    - Factory functions para creación segura
    - Migración gradual sin breaking changes
 
+## NUEVA INVESTIGACIÓN REQUERIDA 🔍
+- Analizar `RCharCloth.cpp` y `RCloth.cpp` para entender normal calculation
+- Investigar lighting falloff differences entre cloth and standard meshes
+- Examinar material slot handling en cloth rendering pipeline
+
 ## PENDIENTE
 - [ ] Mejorar LOD system (dejado para después según solicitud)
+- [ ] **NUEVO**: Fix cloth rendering bugs (alta prioridad por compatibilidad)
